@@ -1,0 +1,57 @@
+{
+  "school": "Guru Gobind Singh Public School",
+  "subjects": {
+    "Science": [
+      {
+        "chapter": "The Solar System",
+        "theory": "The solar system includes the Sun, planets, moons, and other celestial objects.",
+        "image": "https://images.unsplash.com/photo-1462332420958-a05d1b8ef9f3?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Earth", "Mars", "Jupiter"],
+        "notes": "Earth is the planet we live on.",
+        "mcqs": [
+          {"question": "Which is the star at the center of our solar system?", "options": ["Moon", "Sun", "Earth", "Mars"], "answer": "Sun"},
+          {"question": "How many planets are in our solar system?", "options": ["7", "8", "9", "10"], "answer": "8"}
+        ]
+      }
+    ],
+    "Mathematics": [
+      {
+        "chapter": "Fractions and Shapes",
+        "theory": "Fractions help us describe parts of a whole, and shapes have different properties.",
+        "image": "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Circle", "Triangle", "Half"],
+        "notes": "A triangle has three sides.",
+        "mcqs": [
+          {"question": "How many sides does a triangle have?", "options": ["2", "3", "4", "5"], "answer": "3"},
+          {"question": "What is half of 8?", "options": ["2", "4", "6", "8"], "answer": "4"}
+        ]
+      }
+    ],
+    "English": [
+      {
+        "chapter": "Reading Comprehension",
+        "theory": "Reading comprehension means understanding what we read.",
+        "image": "https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Story", "Poem"],
+        "notes": "Ask yourself what happened in the story.",
+        "mcqs": [
+          {"question": "What is reading comprehension?", "options": ["Writing words", "Understanding text", "Drawing pictures", "Talking loudly"], "answer": "Understanding text"},
+          {"question": "Which is a story?", "options": ["Poem", "Novel", "Song", "Map"], "answer": "Novel"}
+        ]
+      }
+    ],
+    "Computer": [
+      {
+        "chapter": "Computer Basics",
+        "theory": "A computer is a machine used to process information and solve problems.",
+        "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Laptop", "Tablet"],
+        "notes": "Use a password to protect your computer account.",
+        "mcqs": [
+          {"question": "What is a computer used for?", "options": ["Cooking", "Processing information", "Sleeping", "Jumping"], "answer": "Processing information"},
+          {"question": "What keeps your computer account safe?", "options": ["Password", "Paper", "Pencil", "Chair"], "answer": "Password"}
+        ]
+      }
+    ]
+  }
+}

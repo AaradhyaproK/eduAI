@@ -1,0 +1,58 @@
+{
+  "school": "Day Care Centre School",
+  "subjects": {
+    "Science": [
+      {
+        "chapter": "Plants and Animals",
+        "theory": "Plants make their own food using sunlight, while animals depend on plants or other animals for food.",
+        "image": "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Sunflower", "Puppy", "Bird"],
+        "notes": "Plants need sunlight, water, and air to grow.",
+        "mcqs": [
+          {"question": "What do plants need to grow?", "options": ["Water", "Stone", "Plastic", "Paper"], "answer": "Water"},
+          {"question": "Which is an animal?", "options": ["Rose", "Cat", "Sunflower", "Tree"], "answer": "Cat"},
+          {"question": "What helps plants make food?", "options": ["Moonlight", "Sunlight", "Rain only", "Snow"], "answer": "Sunlight"}
+        ]
+      }
+    ],
+    "Mathematics": [
+      {
+        "chapter": "Counting and Numbers",
+        "theory": "Counting helps us know how many objects we have.",
+        "image": "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?auto=format&fit=crop&w=800&q=80",
+        "examples": ["1,2,3", "10,20,30"],
+        "notes": "Practice counting every day.",
+        "mcqs": [
+          {"question": "What comes after 4?", "options": ["2", "3", "5", "6"], "answer": "5"},
+          {"question": "What is 3 + 2?", "options": ["4", "5", "6", "7"], "answer": "5"}
+        ]
+      }
+    ],
+    "English": [
+      {
+        "chapter": "Alphabet Basics",
+        "theory": "Letters combine to form words and sentences.",
+        "image": "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80",
+        "examples": ["A, B, C", "Cat"],
+        "notes": "Read aloud every day.",
+        "mcqs": [
+          {"question": "Which letter comes first in the alphabet?", "options": ["B", "A", "C", "D"], "answer": "A"},
+          {"question": "Which word is formed with the letters C-A-T?", "options": ["Dog", "Cat", "Sun", "Book"], "answer": "Cat"}
+        ]
+      }
+    ],
+    "Computer": [
+      {
+        "chapter": "Using a Computer",
+        "theory": "A computer helps us learn, draw, and play educational games.",
+        "image": "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Keyboard", "Mouse"],
+        "notes": "Press keys gently and keep the screen clean.",
+        "mcqs": [
+          {"question": "What do we use to click on a computer?", "options": ["Mouse", "Pencil", "Book", "Chair"], "answer": "Mouse"},
+          {"question": "What is a computer used for?", "options": ["Cooking", "Learning", "Sleeping", "Running"], "answer": "Learning"}
+        ]
+      }
+    ]
+  }
+}
