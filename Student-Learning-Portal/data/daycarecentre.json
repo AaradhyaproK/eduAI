@@ -13,6 +13,42 @@
           {"question": "Which is an animal?", "options": ["Rose", "Cat", "Sunflower", "Tree"], "answer": "Cat"},
           {"question": "What helps plants make food?", "options": ["Moonlight", "Sunlight", "Rain only", "Snow"], "answer": "Sunlight"}
         ]
+      },
+      {
+        "chapter": "Living and Non-Living Things",
+        "theory": "Living things grow, breathe, and need food. Non-living things do not grow or breathe.",
+        "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Dog", "Rock", "Tree"],
+        "notes": "A plant is living, but a pencil is non-living.",
+        "mcqs": [
+          {"question": "Which is a living thing?", "options": ["Chair", "Tree", "Stone", "Cup"], "answer": "Tree"},
+          {"question": "What do living things need to grow?", "options": ["Food", "Plastic", "Metal", "Glass"], "answer": "Food"},
+          {"question": "Which of these is non-living?", "options": ["Bird", "Fish", "Book", "Dog"], "answer": "Book"}
+        ]
+      },
+      {
+        "chapter": "Our Body",
+        "theory": "Our body has different parts that help us move, eat, and breathe.",
+        "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=800&q=80",
+        "examples": ["Eyes", "Hands", "Legs"],
+        "notes": "We use our eyes to see and ears to hear.",
+        "mcqs": [
+          {"question": "Which body part helps us see?", "options": ["Ears", "Eyes", "Nose", "Hands"], "answer": "Eyes"},
+          {"question": "Which part helps us hear?", "options": ["Ears", "Feet", "Mouth", "Hair"], "answer": "Ears"},
+          {"question": "We use our legs to do what?", "options": ["Walk", "Sleep", "Drink", "Think"], "answer": "Walk"}
+        ]
+      },
+      {
+        "chapter": "Water and Air",
+        "theory": "Water and air are important for life. We need clean water to drink and fresh air to breathe.",
+        "image": "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=800&q=80",
+        "examples": ["River", "Cloud", "Wind"],
+        "notes": "Plants and animals need water and air to survive.",
+        "mcqs": [
+          {"question": "Why do we need water?", "options": ["To play", "To drink and live", "To sleep", "To jump"], "answer": "To drink and live"},
+          {"question": "What do we breathe in?", "options": ["Air", "Stone", "Sand", "Milk"], "answer": "Air"},
+          {"question": "Which is a source of water?", "options": ["River", "Book", "Ruler", "Table"], "answer": "River"}
+        ]
       }
     ],
     "Mathematics": [

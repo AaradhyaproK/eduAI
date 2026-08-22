@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (subject) {
         showLoader();
         setTimeout(() => {
-          window.location.href = `lesson.html?subject=${encodeURIComponent(subject)}`;
+          window.location.href = `quiz.html?subject=${encodeURIComponent(subject)}`;
         }, 500);
       }
     });
