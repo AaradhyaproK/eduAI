@@ -142,6 +142,33 @@ async function saveQuizResultToMongo(resultData) {
   saveResults(results);
 }
 
+async function fetchSubjectsFromMongo(school) {
+  try {
+    const url = school ? `/api/subjects?school=${encodeURIComponent(school)}` : "/api/subjects";
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Failed fetching subjects");
+    const data = await res.json();
+    return data.subjects || {};
+  } catch (err) {
+    console.warn("Could not fetch subjects from MongoDB API, falling back to static files:", err);
+    return null;
+  }
+}
+
+async function fetchUserResultsFromMongo() {
+  try {
+    const token = getAuthToken();
+    const res = await fetch("/api/results/summary", {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Failed fetching results");
+    return await res.json();
+  } catch (err) {
+    console.warn("Could not fetch user results from MongoDB API:", err);
+    return null;
+  }
+}
+
 // UI Theme & Logout Handlers
 function applyTheme(theme) {
   document.body.classList.toggle("dark-mode", theme === "dark");

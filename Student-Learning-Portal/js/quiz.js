@@ -26,10 +26,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedChapter = null;
   let generatedQuestions = [];
 
-  try {
-    const response = await fetch(schoolDataMap[school]);
-    const data = await response.json();
-    const chapters = data.subjects?.[subject] || [];
+    let chapters = [];
+    if (typeof fetchSubjectsFromMongo === "function") {
+      const mongoSubjects = await fetchSubjectsFromMongo(school);
+      if (mongoSubjects && mongoSubjects[subject] && mongoSubjects[subject].length) {
+        chapters = mongoSubjects[subject];
+      }
+    }
+
+    if (!chapters.length) {
+      const response = await fetch(schoolDataMap[school] || schoolDataMap["Day Care Centre School"]);
+      const data = await response.json();
+      chapters = data.subjects?.[subject] || [];
+    }
 
     if (!chapters.length) {
       quizContainer.innerHTML = "<div class='alert alert-warning'>No quiz content available for this subject yet.</div>";

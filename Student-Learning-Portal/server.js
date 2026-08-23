@@ -15,6 +15,7 @@ const path = require("path");
 
 const { router: authRouter } = require("./routes/auth");
 const resultsRouter = require("./routes/results");
+const subjectsRouter = require("./routes/subjects");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname)));
 // API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/results", resultsRouter);
+app.use("/api/subjects", subjectsRouter);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
