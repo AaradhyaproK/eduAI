@@ -26,6 +26,7 @@ const authMiddleware = (req, res, next) => {
 router.post("/register", async (req, res) => {
   try {
     const { name, username, email, password, schoolName, className } = req.body;
+    const sendEmail = require("../utils/sendEmail");
 
     if (!name || !username || !password) {
       return res.status(400).json({ message: "Name, Username, and Password are required." });
@@ -39,26 +40,55 @@ router.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Generate 6-digit OTP code for new user
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
     const user = new User({
       name: name.trim(),
       username: username.toLowerCase().trim(),
       email: email ? email.trim() : "",
       password: hashedPassword,
       schoolName: schoolName || "Day Care Centre School",
-      className: className || "Class 5"
+      className: className || "Class 5",
+      otp: otp,
+      otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000)
     });
 
     await user.save();
 
+    const targetEmail = user.email || `${user.username}@schoolportal.com`;
+
+    // Send OTP email
+    if (targetEmail && targetEmail.includes("@")) {
+      await sendEmail({
+        to: targetEmail,
+        subject: "🎉 EduMind AI - Welcome & Your Account Verification OTP",
+        text: `Welcome to EduMind AI Portal, ${user.name}!\n\nYour 6-digit account verification OTP code is: ${otp}\n\nThis code is valid for 10 minutes.`,
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+            <h2 style="color: #2b6cb0; text-align: center;">📘 Welcome to EduMind AI!</h2>
+            <p>Hello <strong>${user.name}</strong>,</p>
+            <p>Thank you for registering. Your 6-digit account verification OTP code is:</p>
+            <div style="background: #edf2f7; font-size: 28px; font-weight: bold; letter-spacing: 5px; text-align: center; padding: 15px; border-radius: 8px; margin: 20px 0; color: #2d3748;">
+              ${otp}
+            </div>
+            <p style="font-size: 13px; color: #718096;">Please enter this OTP to complete your account setup.</p>
+          </div>
+        `
+      }).catch(err => console.error("Registration email sending notice:", err.message));
+    }
+
     const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: "7d" });
 
     res.status(201).json({
-      message: "Registration successful",
+      message: `Account created! OTP sent to ${targetEmail}`,
       token,
+      demoOtp: process.env.EMAIL_USER ? undefined : otp,
       user: {
         id: user._id,
         name: user.name,
         username: user.username,
+        email: user.email,
         schoolName: user.schoolName,
         className: user.className
       }
