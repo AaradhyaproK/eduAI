@@ -37,61 +37,74 @@
               <p class="text-center text-muted mb-4">Register your child to begin learning with a personalized dashboard.</p>
               <div id="registerMessage" class="alert d-none" role="alert"></div>
               <form id="registerForm" novalidate>
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label class="form-label">Student Name</label>
-                    <input type="text" id="regName" class="form-control" required />
+                <div id="regDetailsSection">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Student Name / Username</label>
+                      <input type="text" id="regName" class="form-control" placeholder="Full name or username" required />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">📧 Email Address (for OTP verification)</label>
+                      <input type="email" id="regEmail" class="form-control" placeholder="student@example.com" required />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Password</label>
+                      <input type="password" id="regPassword" class="form-control" placeholder="Min 6 characters" required />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Confirm Password</label>
+                      <input type="password" id="regConfirmPassword" class="form-control" placeholder="Re-enter password" required />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Age</label>
+                      <input type="number" id="regAge" class="form-control" placeholder="Age" required />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Standard / Class</label>
+                      <select id="regClass" class="form-select">
+                        <option value="">Choose class</option>
+                        <option value="Nursery">Nursery</option>
+                        <option value="KG">KG</option>
+                        <option value="Class 1">Class 1</option>
+                        <option value="Class 2">Class 2</option>
+                        <option value="Class 3">Class 3</option>
+                        <option value="Class 4">Class 4</option>
+                        <option value="Class 5">Class 5</option>
+                        <option value="Class 6">Class 6</option>
+                        <option value="Class 7">Class 7</option>
+                        <option value="Class 8">Class 8</option>
+                        <option value="Class 9">Class 9</option>
+                        <option value="Class 10">Class 10</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">School</label>
+                      <select id="regSchool" class="form-select">
+                        <option value="Day Care Centre School">Day Care Centre School</option>
+                        <option value="Guru Gobind Singh Public School">Guru Gobind Singh Public School</option>
+                        <option value="SSC Board">SSC Board</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Parent Name</label>
+                      <input type="text" id="regParent" class="form-control" placeholder="Parent name" required />
+                    </div>
                   </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="regPassword" class="form-control" required />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Confirm Password</label>
-                    <input type="password" id="regConfirmPassword" class="form-control" required />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Age</label>
-                    <input type="number" id="regAge" class="form-control" required />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Standard</label>
-                    <select id="regClass" class="form-select">
-                      <option value="">Choose class</option>
-                      <option value="Nursery">Nursery</option>
-                      <option value="KG">KG</option>
-                      <option value="Class 1">Class 1</option>
-                      <option value="Class 2">Class 2</option>
-                      <option value="Class 3">Class 3</option>
-                      <option value="Class 4">Class 4</option>
-                      <option value="Class 5">Class 5</option>
-                      <option value="Class 6">Class 6</option>
-                      <option value="Class 7">Class 7</option>
-                      <option value="Class 8">Class 8</option>
-                      <option value="Class 9">Class 9</option>
-                      <option value="Class 10">Class 10</option>
-                    </select>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">School</label>
-                    <select id="regSchool" class="form-select">
-                      <option value="">Choose school</option>
-                      <option value="Day Care Centre School">Day Care Centre School</option>
-                      <option value="Guru Gobind Singh Public School">Guru Gobind Singh Public School</option>
-                    </select>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Parent Name</label>
-                    <input type="text" id="regParent" class="form-control" required />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Mobile Number</label>
-                    <input type="tel" id="regMobile" class="form-control" required />
+                  <div class="mt-4 d-flex flex-wrap gap-2">
+                    <button type="submit" id="regSubmitBtn" class="btn btn-primary px-4 py-2 fw-semibold">📩 Register & Send OTP</button>
+                    <button type="reset" class="btn btn-outline-secondary">Reset</button>
                   </div>
                 </div>
-                <div class="mt-4 d-flex flex-wrap gap-2">
-                  <button type="submit" class="btn btn-primary">Register</button>
-                  <button type="reset" class="btn btn-outline-secondary">Reset</button>
+
+                <!-- OTP Verification Step -->
+                <div id="regOtpSection" class="d-none mt-4 p-4 border rounded-4 bg-light">
+                  <h4 class="fw-bold mb-2">🔑 Verify Your Email OTP</h4>
+                  <p class="text-muted small">We sent a 6-digit OTP code to your email. Enter it below to complete registration.</p>
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">6-Digit OTP Code</label>
+                    <input type="text" id="regOtpInput" class="form-control text-center fs-4 letter-spacing-2" placeholder="123456" maxlength="6" required />
+                  </div>
+                  <button type="button" id="regVerifyOtpBtn" class="btn btn-success w-100 py-2 fw-semibold">✅ Verify OTP & Complete Account Setup</button>
                 </div>
               </form>
             </div>
