@@ -22,10 +22,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname)));
-
-// API Routes
+// API Routes (must be defined before static middleware)
 app.use("/api/auth", authRouter);
 app.use("/api/results", resultsRouter);
 app.use("/api/subjects", subjectsRouter);
@@ -38,6 +35,14 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date()
   });
 });
+
+// JSON fallback for unhandled /api requests
+app.use("/api/*", (req, res) => {
+  res.status(404).json({ message: "API endpoint not found. Please restart server." });
+});
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname)));
 
 // Start Express server
 const server = app.listen(PORT, () => {
