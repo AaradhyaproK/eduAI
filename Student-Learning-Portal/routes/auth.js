@@ -107,6 +107,100 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Send OTP for Forgot Password or Account Verification
+router.post("/send-otp", async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    const sendEmail = require("../utils/sendEmail");
+
+    if (!username && !email) {
+      return res.status(400).json({ message: "Username or Email is required." });
+    }
+
+    const query = email
+      ? { email: email.toLowerCase().trim() }
+      : { username: username.toLowerCase().trim() };
+
+    const user = await User.findOne(query);
+    if (!user) {
+      return res.status(404).json({ message: "No student account found with these details." });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes valid
+    await user.save();
+
+    const targetEmail = user.email || email || `${user.username}@schoolportal.com`;
+
+    await sendEmail({
+      to: targetEmail,
+      subject: "🔒 EduMind AI - Your Password Reset OTP",
+      text: `Hello ${user.name},\n\nYour 6-digit OTP code to reset your EduMind AI portal password is: ${otp}\n\nThis OTP is valid for 10 minutes. Do not share it with anyone.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; border: 1px solid #e0e0e0; rounded: 10px;">
+          <h2 style="color: #2b6cb0; text-align: center;">📘 EduMind AI Portal</h2>
+          <p>Hello <strong>${user.name}</strong>,</p>
+          <p>Your 6-digit OTP code for password reset is:</p>
+          <div style="background: #edf2f7; font-size: 28px; font-weight: bold; letter-spacing: 5px; text-align: center; padding: 15px; border-radius: 8px; margin: 20px 0; color: #2d3748;">
+            ${otp}
+          </div>
+          <p style="font-size: 13px; color: #718096;">This code is valid for <strong>10 minutes</strong>. If you did not request a password reset, please ignore this email.</p>
+        </div>
+      `
+    });
+
+    res.json({
+      message: `OTP sent successfully to ${targetEmail}`,
+      username: user.username,
+      demoOtp: process.env.EMAIL_USER ? undefined : otp // Expose OTP in response for easy local testing if email credentials not set
+    });
+  } catch (error) {
+    console.error("Send OTP error:", error);
+    res.status(500).json({ message: "Failed to send OTP email." });
+  }
+});
+
+// Reset Password using OTP
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { username, otp, newPassword } = req.body;
+
+    if (!username || !otp || !newPassword) {
+      return res.status(400).json({ message: "Username, OTP, and New Password are required." });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters." });
+    }
+
+    const user = await User.findOne({ username: username.toLowerCase().trim() });
+    if (!user) {
+      return res.status(404).json({ message: "User account not found." });
+    }
+
+    if (!user.otp || user.otp !== otp.trim()) {
+      return res.status(400).json({ message: "Invalid OTP code. Please check and try again." });
+    }
+
+    if (user.otpExpiresAt && new Date() > user.otpExpiresAt) {
+      return res.status(400).json({ message: "OTP has expired. Please request a new OTP." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    user.otp = null;
+    user.otpExpiresAt = null;
+    await user.save();
+
+    res.json({ message: "Password updated successfully! You can now log in." });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Failed to reset password." });
+  }
+});
+
 // Current User Profile
 router.get("/me", authMiddleware, async (req, res) => {
   try {

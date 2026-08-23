@@ -169,6 +169,28 @@ async function fetchUserResultsFromMongo() {
   }
 }
 
+async function sendOtpWithMongo({ username, email }) {
+  const res = await fetch("/api/auth/send-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, email })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to send OTP");
+  return data;
+}
+
+async function resetPasswordWithMongo({ username, otp, newPassword }) {
+  const res = await fetch("/api/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, otp, newPassword })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to reset password");
+  return data;
+}
+
 // UI Theme & Logout Handlers
 function applyTheme(theme) {
   document.body.classList.toggle("dark-mode", theme === "dark");
