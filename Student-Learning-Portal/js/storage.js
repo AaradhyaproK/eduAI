@@ -16,9 +16,23 @@ const RESULTS_KEY = "smartStudentPortalResults";
 const THEME_KEY = "smartStudentPortalTheme";
 const AUTH_TOKEN_KEY = "edumindAuthToken";
 
-const API_BASE_URL = window.location.origin.includes("localhost") || window.location.origin.includes("127.0.0.1")
-  ? ""
+// Dynamic API Base URL resolver (Routes requests to Express server on port 3000 if opened via Live Server, file://, or secondary ports)
+const API_BASE_URL = (typeof window !== "undefined" && (
+  window.location.protocol === "file:" || 
+  (window.location.port && window.location.port !== "3000")
+))
+  ? "http://localhost:3000"
   : "";
+
+// Helper to safely parse API responses
+async function parseJsonResponse(res) {
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    const text = await res.text();
+    throw new Error(`Server returned non-JSON response. Please ensure Express server is running on port 3000.`);
+  }
+  return await res.json();
+}
 
 // Token Management
 function getAuthToken() {
@@ -69,18 +83,19 @@ function saveResults(results) {
 // MongoDB API Functions
 async function registerUserWithMongo(userData) {
   try {
-    const res = await fetch("/api/auth/register", {
+    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData)
     });
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (!res.ok) throw new Error(data.message || "Registration failed");
     if (data.token) setAuthToken(data.token);
     if (data.user) setCurrentStudent(data.user);
     return data;
   } catch (err) {
-    console.warn("MongoDB Register API fallback:", err.message);
+    console.warn("MongoDB Register API notice:", err.message);
+    if (err.message.includes("Server returned non-JSON")) throw err;
     // Local fallback
     const students = getStudents();
     const existing = students.find(s => s.username?.toLowerCase() === userData.username?.toLowerCase());
@@ -95,18 +110,19 @@ async function registerUserWithMongo(userData) {
 
 async function loginUserWithMongo({ username, password }) {
   try {
-    const res = await fetch("/api/auth/login", {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (!res.ok) throw new Error(data.message || "Login failed");
     if (data.token) setAuthToken(data.token);
     if (data.user) setCurrentStudent(data.user);
     return data;
   } catch (err) {
-    console.warn("MongoDB Login API fallback:", err.message);
+    console.warn("MongoDB Login API notice:", err.message);
+    if (err.message.includes("Server returned non-JSON")) throw err;
     // Local fallback
     const students = getStudents();
     const student = students.find(s => s.name === username || s.username === username);
@@ -121,7 +137,7 @@ async function loginUserWithMongo({ username, password }) {
 async function saveQuizResultToMongo(resultData) {
   try {
     const token = getAuthToken();
-    const res = await fetch("/api/results", {
+    const res = await fetch(`${API_BASE_URL}/api/results`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -130,7 +146,7 @@ async function saveQuizResultToMongo(resultData) {
       body: JSON.stringify(resultData)
     });
     if (res.ok) {
-      const data = await res.json();
+      const data = await parseJsonResponse(res);
       console.log("Quiz result saved to MongoDB Atlas!");
     }
   } catch (err) {
@@ -144,10 +160,10 @@ async function saveQuizResultToMongo(resultData) {
 
 async function fetchSubjectsFromMongo(school) {
   try {
-    const url = school ? `/api/subjects?school=${encodeURIComponent(school)}` : "/api/subjects";
+    const url = school ? `${API_BASE_URL}/api/subjects?school=${encodeURIComponent(school)}` : `${API_BASE_URL}/api/subjects`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("Failed fetching subjects");
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     return data.subjects || {};
   } catch (err) {
     console.warn("Could not fetch subjects from MongoDB API, falling back to static files:", err);
@@ -158,11 +174,11 @@ async function fetchSubjectsFromMongo(school) {
 async function fetchUserResultsFromMongo() {
   try {
     const token = getAuthToken();
-    const res = await fetch("/api/results/summary", {
+    const res = await fetch(`${API_BASE_URL}/api/results/summary`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!res.ok) throw new Error("Failed fetching results");
-    return await res.json();
+    return await parseJsonResponse(res);
   } catch (err) {
     console.warn("Could not fetch user results from MongoDB API:", err);
     return null;
@@ -170,23 +186,23 @@ async function fetchUserResultsFromMongo() {
 }
 
 async function sendOtpWithMongo({ username, email }) {
-  const res = await fetch("/api/auth/send-otp", {
+  const res = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email })
   });
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
   if (!res.ok) throw new Error(data.message || "Failed to send OTP");
   return data;
 }
 
 async function resetPasswordWithMongo({ username, otp, newPassword }) {
-  const res = await fetch("/api/auth/reset-password", {
+  const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, otp, newPassword })
   });
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
   if (!res.ok) throw new Error(data.message || "Failed to reset password");
   return data;
 }
