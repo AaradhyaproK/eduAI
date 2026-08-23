@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     errorBox.classList.add("d-none");
 
@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const errors = [];
     if (!name) errors.push("Student ID or username is required.");
     if (!password) errors.push("Password is required.");
-    if (password.length < 8) errors.push("Password must be at least 8 characters.");
 
     if (errors.length) {
       errorBox.classList.remove("d-none");
@@ -35,22 +34,22 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const students = getStudents();
-    const matchedStudent = students.find((student) => student.name === name && student.password === password);
+    try {
+      showLoader();
+      const response = await loginUserWithMongo({ username: name, password });
+      hideLoader();
 
-    if (!matchedStudent) {
+      if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+        localStorage.setItem("smartStudentPortalRememberedUser", JSON.stringify({ name }));
+      } else {
+        localStorage.removeItem("smartStudentPortalRememberedUser");
+      }
+
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      hideLoader();
       errorBox.classList.remove("d-none");
-      errorBox.innerHTML = "Student account not found. Please register first or check your details.";
-      return;
+      errorBox.innerHTML = err.message || "Login failed. Please check your credentials.";
     }
-
-    if (rememberMeCheckbox && rememberMeCheckbox.checked) {
-      localStorage.setItem("smartStudentPortalRememberedUser", JSON.stringify({ name }));
-    } else {
-      localStorage.removeItem("smartStudentPortalRememberedUser");
-    }
-
-    setCurrentStudent(matchedStudent);
-    window.location.href = "dashboard.html";
   });
 });

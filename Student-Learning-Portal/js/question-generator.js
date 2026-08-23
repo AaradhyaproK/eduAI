@@ -39,16 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const type = schoolNameSelect ? schoolNameSelect.value : 'ssc';
-    const subject = subjectSelect ? subjectSelect.value : 'general-science';
-
-    if (subject !== 'general-science' && subject !== 'mathematics') {
-      showError('This version currently supports General Science and Mathematics for SSC Board and Day Care Centre School students.');
-      return;
-    }
+    const subject = subjectSelect ? subjectSelect.value : 'General Science';
 
     chapters = parseChapters(text, type, subject);
     if (chapters.length === 0) {
-      showError('No chapters detected. Make sure the PDF or text has chapter headings such as "Chapter 1" or similar.');
+      showError('No chapters detected. Make sure the PDF or text has chapter headings or paragraphs.');
       return;
     }
 
@@ -56,14 +51,37 @@ document.addEventListener('DOMContentLoaded', () => {
     chaptersSection.classList.remove('d-none');
   });
 
-  generateBtn.addEventListener('click', () => {
+  generateBtn.addEventListener('click', async () => {
     const idx = chapterSelect.selectedIndex;
     if (idx < 0) return;
     const chapter = chapters[idx];
-    const num = Math.max(1, parseInt(numQuestionsInput.value, 10) || 1);
-    const subject = subjectSelect ? subjectSelect.value : 'general-science';
-    const qs = generateQuestionsFromText(chapter.content, num, subject);
-    displayQuestions(qs);
+    const num = Math.max(1, parseInt(numQuestionsInput.value, 10) || 5);
+    const subject = subjectSelect ? subjectSelect.value : 'General Science';
+
+    results.innerHTML = `
+      <div class="text-center py-4">
+        <div class="spinner-border text-primary mb-2" role="status"></div>
+        <p class="mb-0 fw-semibold text-primary">Generating AI Questions with Gemini Flash...</p>
+        <p class="text-muted small mb-0">Analyzing subject: ${escapeHtml(subject)}</p>
+      </div>
+    `;
+    generateBtn.disabled = true;
+
+    try {
+      const qs = await window.generateQuestionsWithGemini({
+        subject: subject,
+        chapterTitle: chapter.title,
+        textContent: chapter.content,
+        count: num,
+        type: 'mcq'
+      });
+      displayQuestions(qs);
+    } catch (err) {
+      console.error("AI question generation error:", err);
+      showError("Failed to generate AI questions. Please try again.");
+    } finally {
+      generateBtn.disabled = false;
+    }
   });
 
   async function readInputAsText(file) {
@@ -265,15 +283,37 @@ document.addEventListener('DOMContentLoaded', () => {
     results.innerHTML = '';
     qs.forEach((q, i) => {
       const item = document.createElement('div');
-      item.className = 'list-group-item';
-      const html = `<div><strong>Q${i + 1}.</strong> ${escapeHtml(q.question)}</div>` + (q.answer ? `<div class="text-muted small mt-1">Answer: ${escapeHtml(q.answer)}</div>` : '');
-      item.innerHTML = html;
+      item.className = 'list-group-item p-3 mb-2 rounded-3 border';
+      
+      let optionsHtml = '';
+      if (Array.isArray(q.options) && q.options.length > 0) {
+        optionsHtml = `
+          <div class="row g-2 mt-2">
+            ${q.options.map((opt, idx) => `
+              <div class="col-md-6">
+                <div class="p-2 border rounded bg-light text-dark small">
+                  <strong>${String.fromCharCode(65 + idx)}.</strong> ${escapeHtml(opt)}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      const answerHtml = q.answer ? `<div class="badge bg-success mt-2">Correct Answer: ${escapeHtml(q.answer)}</div>` : '';
+
+      item.innerHTML = `
+        <div class="fw-semibold text-dark"><strong>Q${i + 1}.</strong> ${escapeHtml(q.question)}</div>
+        ${optionsHtml}
+        ${answerHtml}
+      `;
       results.appendChild(item);
     });
     generatedCount.textContent = String(qs.length);
   }
 
   function escapeHtml(s) {
-    return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    if (!s) return "";
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 });

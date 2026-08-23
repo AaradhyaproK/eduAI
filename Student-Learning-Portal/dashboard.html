@@ -20,6 +20,7 @@
           <ul class="navbar-nav ms-auto align-items-lg-center">
             <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="subjects.html">Subjects</a></li>
+            <li class="nav-item"><a class="nav-link" href="question-generator.html">AI Question Generator</a></li>
             <li class="nav-item"><a class="nav-link" href="progress.html">Progress</a></li>
             <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
             <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
@@ -34,22 +35,30 @@
     <main class="container py-5">
       <div class="row g-4">
         <div class="col-lg-8">
-          <div class="card rounded-4 p-4 shadow-sm">
+          <div class="card rounded-4 p-4 shadow-sm border-0">
             <h2 class="section-title">Welcome, <span id="dashName">Student</span></h2>
             <p class="text-muted mb-1">Username: <span id="dashNameValue">Student</span></p>
             <p class="text-muted mb-0">Password: <span id="dashPassword">Password</span></p>
             <div class="row g-3 mt-3">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="p-3 rounded-4 bg-primary text-white">
                   <h5>Completed Subjects</h5>
                   <h2 id="completedSubjects">0</h2>
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="p-3 rounded-4 bg-success text-white">
                   <h5>Best Score</h5>
                   <h2 id="bestScore">0%</h2>
                 </div>
+              </div>
+              <div class="col-md-4">
+                <a href="question-generator.html" class="text-decoration-none">
+                  <div class="p-3 rounded-4 bg-dark text-white h-100 d-flex flex-column justify-content-between">
+                    <h5>✨ AI Question Generator</h5>
+                    <p class="mb-0 small text-white-50">Generate custom AI questions &rarr;</p>
+                  </div>
+                </a>
               </div>
             </div>
           </div>

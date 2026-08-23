@@ -98,43 +98,54 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function renderQuestions(questions) {
       generatedQuestions = questions;
-      questionArea.innerHTML = questions.map((question, index) => `
-        <div class='card p-3 mb-3'>
-          <p class='fw-semibold'>${index + 1}. ${question.question}</p>
+      questionArea.innerHTML = `
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="badge bg-primary fs-6 px-3 py-2">✨ Powered by Gemini AI</span>
+          <span class="text-muted small">${questions.length} Questions</span>
+        </div>
+      ` + questions.map((question, index) => `
+        <div class='card p-3 mb-3 border-0 shadow-sm rounded-4'>
+          <p class='fw-semibold mb-2'>${index + 1}. ${escapeHtml(question.question)}</p>
           <div class='form-check'>${question.options.map((option) => `
-            <label class='d-block mb-2'>
-              <input type='radio' name='q${index}' value='${option}' /> ${option}
+            <label class='d-block mb-2 cursor-pointer'>
+              <input type='radio' name='q${index}' value='${escapeHtml(option)}' /> ${escapeHtml(option)}
             </label>
           `).join("")}</div>
         </div>
       `).join("");
     }
 
-    function generateAiQuestions(chapter, count) {
-      const baseQuestions = chapter.mcqs || [];
-      const generated = [];
+    async function loadAndRenderQuestions(chapter, count) {
+      questionArea.innerHTML = `
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+          <p class="fw-semibold text-primary mb-1">Generating AI Questions with Gemini Flash...</p>
+          <p class="text-muted small">Tailoring questions for subject: ${escapeHtml(subject)} (${escapeHtml(chapter.chapter)})</p>
+        </div>
+      `;
+      if (generateBtn) generateBtn.disabled = true;
 
-      for (let i = 0; i < count; i += 1) {
-        const source = baseQuestions[i % baseQuestions.length] || {
-          question: `Which fact matches the chapter "${chapter.chapter}"?`,
-          options: [chapter.examples[0] || "Plant", chapter.notes || "Observation", "Stone", "River"],
-          answer: chapter.examples[0] || "Plant"
-        };
-
-        const shuffled = [...source.options];
-        for (let j = shuffled.length - 1; j > 0; j -= 1) {
-          const randomIndex = Math.floor(Math.random() * (j + 1));
-          [shuffled[j], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[j]];
-        }
-
-        generated.push({
-          question: `${source.question}`,
-          options: shuffled,
-          answer: source.answer
+      try {
+        const textContext = `${chapter.theory || ""} ${chapter.notes || ""}`;
+        const questions = await window.generateQuestionsWithGemini({
+          subject: subject,
+          chapterTitle: chapter.chapter,
+          textContent: textContext,
+          count: count,
+          type: "mcq"
         });
+        renderQuestions(questions);
+      } catch (err) {
+        console.error("Failed generating questions:", err);
+        questionArea.innerHTML = "<div class='alert alert-warning'>Failed to generate questions via Gemini AI. Please try again.</div>";
+      } finally {
+        if (generateBtn) generateBtn.disabled = false;
       }
+    }
 
-      return generated;
+    function escapeHtml(s) {
+      if (!s) return "";
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
     renderChapterButtons();
@@ -142,11 +153,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     generateBtn.addEventListener("click", () => {
       const count = Math.max(1, Math.min(20, Number(questionCountInput.value) || 5));
-      const questions = generateAiQuestions(selectedChapter, count);
-      renderQuestions(questions);
+      loadAndRenderQuestions(selectedChapter, count);
     });
 
-    submitButton.addEventListener("click", () => {
+    submitButton.addEventListener("click", async () => {
       if (!generatedQuestions.length) {
         alert("Please generate questions first.");
         return;
@@ -172,15 +182,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         date: new Date().toLocaleDateString()
       };
 
-      const results = getResults();
-      results.push(result);
-      saveResults(results);
+      if (typeof saveQuizResultToMongo === "function") {
+        await saveQuizResultToMongo(result);
+      } else {
+        const results = getResults();
+        results.push(result);
+        saveResults(results);
+      }
+
       sessionStorage.setItem("lastResult", JSON.stringify(result));
       window.location.href = "result.html";
     });
 
-    const initialQuestions = generateAiQuestions(selectedChapter, 5);
-    renderQuestions(initialQuestions);
+    loadAndRenderQuestions(selectedChapter, 5);
   } catch (error) {
     quizContainer.innerHTML = "<div class='alert alert-danger'>Unable to load quiz data right now.</div>";
   }

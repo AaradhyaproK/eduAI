@@ -6,30 +6,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!form) return;
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     messageBox.className = "alert d-none";
 
-    const student = {
+    const studentData = {
       name: document.getElementById("regName").value.trim(),
+      username: document.getElementById("regName").value.trim(),
       password: document.getElementById("regPassword").value,
       confirmPassword: document.getElementById("regConfirmPassword").value,
       age: document.getElementById("regAge").value,
       className: document.getElementById("regClass").value,
-      school: document.getElementById("regSchool").value,
+      schoolName: document.getElementById("regSchool").value,
       parentName: document.getElementById("regParent").value.trim(),
       mobile: document.getElementById("regMobile").value.trim(),
     };
 
     const errors = [];
-    if (!student.name) errors.push("Student name is required.");
-    if (!student.password || student.password.length < 8) errors.push("Password must be at least 8 characters.");
-    if (student.password !== student.confirmPassword) errors.push("Passwords do not match.");
-    if (!student.age || Number(student.age) < 3 || Number(student.age) > 18) errors.push("Age must be between 3 and 18.");
-    if (!student.className) errors.push("Class is required.");
-    if (!student.school) errors.push("School is required.");
-    if (!student.parentName) errors.push("Parent name is required.");
-    if (!student.mobile) errors.push("Mobile number is required.");
+    if (!studentData.name) errors.push("Student name is required.");
+    if (!studentData.password || studentData.password.length < 6) errors.push("Password must be at least 6 characters.");
+    if (studentData.password !== studentData.confirmPassword) errors.push("Passwords do not match.");
 
     if (errors.length) {
       messageBox.className = "alert alert-danger";
@@ -37,21 +33,19 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const students = getStudents();
-    const duplicate = students.some((existing) => existing.name.toLowerCase() === student.name.toLowerCase() && existing.school === student.school);
-    if (duplicate) {
-      messageBox.className = "alert alert-warning";
-      messageBox.textContent = "This student is already registered.";
-      return;
+    try {
+      showLoader();
+      const response = await registerUserWithMongo(studentData);
+      hideLoader();
+      messageBox.className = "alert alert-success";
+      messageBox.innerHTML = `<strong>Account created & saved to MongoDB!</strong><br />Username: ${studentData.name}`;
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 800);
+    } catch (err) {
+      hideLoader();
+      messageBox.className = "alert alert-danger";
+      messageBox.textContent = err.message || "Registration failed. Please try again.";
     }
-
-    students.push(student);
-    saveStudents(students);
-    setCurrentStudent(student);
-    messageBox.className = "alert alert-success";
-    messageBox.innerHTML = `<strong>Account created successfully.</strong><br />Username: ${student.name}<br />Password: ${student.password}`;
-    setTimeout(() => {
-      window.location.href = "dashboard.html";
-    }, 700);
   });
 });
