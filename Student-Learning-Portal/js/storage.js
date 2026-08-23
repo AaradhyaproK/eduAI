@@ -1,5 +1,15 @@
 // Central storage helpers for students, passwords, results, theme, and MongoDB API integration.
 
+function showLoader() {
+  const loader = document.getElementById("loader");
+  if (loader) loader.classList.remove("d-none");
+}
+
+function hideLoader() {
+  const loader = document.getElementById("loader");
+  if (loader) loader.classList.add("d-none");
+}
+
 const STUDENT_STORAGE_KEY = "smartStudentPortalStudents";
 const CURRENT_STUDENT_KEY = "smartStudentPortalCurrentStudent";
 const RESULTS_KEY = "smartStudentPortalResults";
