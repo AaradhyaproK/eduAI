@@ -81,31 +81,28 @@ function saveResults(results) {
 }
 
 // MongoDB API Functions
-async function registerUserWithMongo(userData) {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData)
-    });
-    const data = await parseJsonResponse(res);
-    if (!res.ok) throw new Error(data.message || "Registration failed");
-    if (data.token) setAuthToken(data.token);
-    if (data.user) setCurrentStudent(data.user);
-    return data;
-  } catch (err) {
-    console.warn("MongoDB Register API notice:", err.message);
-    if (err.message.includes("Server returned non-JSON")) throw err;
-    // Local fallback
-    const students = getStudents();
-    const existing = students.find(s => s.username?.toLowerCase() === userData.username?.toLowerCase());
-    if (existing) throw new Error("Username already exists.");
-    const newStudent = { ...userData, password: userData.password };
-    students.push(newStudent);
-    saveStudents(students);
-    setCurrentStudent(newStudent);
-    return { user: newStudent };
-  }
+async function sendRegisterOtpWithMongo(userData) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/register-send-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData)
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new Error(data.message || "Failed to send registration OTP");
+  return data;
+}
+
+async function verifyRegisterOtpWithMongo({ regToken, otp }) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/register-verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ regToken, otp })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new Error(data.message || "Failed to verify OTP and save account");
+  if (data.token) setAuthToken(data.token);
+  if (data.user) setCurrentStudent(data.user);
+  return data;
 }
 
 async function loginUserWithMongo({ username, password }) {

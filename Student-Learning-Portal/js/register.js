@@ -1,4 +1,4 @@
-// Registration page logic with 2-step Email OTP verification.
+// Registration page logic with 2-step Email OTP verification BEFORE account creation in MongoDB.
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registerForm");
@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const regVerifyOtpBtn = document.getElementById("regVerifyOtpBtn");
   const regOtpInput = document.getElementById("regOtpInput");
 
-  let pendingStudentData = null;
-  let sentOtpCode = null;
+  let registrationSession = null; // Holds temporary regToken
 
   if (!form) return;
 
+  // Step 1: Submit Form -> Validate & Send Email OTP (Account NOT saved yet)
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     messageBox.className = "alert d-none";
@@ -47,25 +47,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (typeof showLoader === "function") showLoader();
       regSubmitBtn.disabled = true;
 
-      // Register account in MongoDB
-      const response = await registerUserWithMongo(studentData);
-
-      // Request OTP for the email
-      let otpRes = null;
-      try {
-        otpRes = await sendOtpWithMongo({ username: studentData.username, email: studentData.email });
-      } catch (e) {
-        console.warn("OTP send notice:", e);
-      }
-
+      // Send OTP to Email without creating MongoDB user record yet
+      const response = await sendRegisterOtpWithMongo(studentData);
       if (typeof hideLoader === "function") hideLoader();
 
-      pendingStudentData = response.user || studentData;
-      sentOtpCode = otpRes?.demoOtp || null;
+      registrationSession = response;
 
       messageBox.className = "alert alert-success";
-      let demoNotice = sentOtpCode ? `<br/><strong>Demo OTP Code: ${sentOtpCode}</strong> (Printed in server console)` : "";
-      messageBox.innerHTML = `<strong>Account details saved!</strong> We sent a 6-digit OTP code to <u>${studentData.email}</u>.${demoNotice}<br/>Please enter the OTP below to verify your account.`;
+      let demoNotice = response.demoOtp ? `<br/><strong>Demo OTP Code: ${response.demoOtp}</strong> (Printed in server console)` : "";
+      messageBox.innerHTML = `<strong>We sent a 6-digit OTP code to <u>${studentData.email}</u>!</strong>${demoNotice}<br/>Please enter the 6-digit code below to verify your email and create your account.`;
 
       regDetailsSection.classList.add("d-none");
       regOtpSection.classList.remove("d-none");
@@ -77,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Verify OTP handler
+  // Step 2: Verify OTP -> ONLY THEN Create Account in MongoDB
   if (regVerifyOtpBtn) {
     regVerifyOtpBtn.addEventListener("click", async () => {
       messageBox.className = "alert d-none";
@@ -89,26 +79,25 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      if (!registrationSession || !registrationSession.regToken) {
+        messageBox.className = "alert alert-danger";
+        messageBox.textContent = "Registration session expired. Please refresh and fill in the registration details again.";
+        return;
+      }
+
       try {
         if (typeof showLoader === "function") showLoader();
 
-        // Verify OTP via MongoDB endpoint
-        await resetPasswordWithMongo({
-          username: pendingStudentData?.username || document.getElementById("regName").value.trim(),
-          otp: enteredOtp,
-          newPassword: document.getElementById("regPassword").value
-        }).catch(err => {
-          // If demo OTP matches or backend verified
-          if (sentOtpCode && enteredOtp === sentOtpCode) {
-            return { message: "OTP Verified" };
-          }
-          throw err;
+        // Verify OTP and Save User Account to MongoDB Atlas
+        const result = await verifyRegisterOtpWithMongo({
+          regToken: registrationSession.regToken,
+          otp: enteredOtp
         });
 
         if (typeof hideLoader === "function") hideLoader();
 
         messageBox.className = "alert alert-success";
-        messageBox.innerHTML = `<strong>✅ Email Verified & Account Setup Complete!</strong> Redirecting to your Dashboard...`;
+        messageBox.innerHTML = `<strong>🎉 ${result.message}</strong> Redirecting to your Dashboard...`;
 
         setTimeout(() => {
           window.location.href = "dashboard.html";
