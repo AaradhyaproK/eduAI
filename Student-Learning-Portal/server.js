@@ -1,13 +1,9 @@
-require("dotenv").config();
 const dns = require("dns");
-
-// Configure public DNS resolution for reliable MongoDB Atlas SRV connection on macOS
 try {
   dns.setServers(["8.8.8.8", "1.1.1.1"]);
-} catch (e) {
-  // Fallback to system default DNS
-}
+} catch (e) {}
 
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -50,10 +46,13 @@ const server = app.listen(PORT, () => {
 
 // Connect to MongoDB Atlas
 mongoose
-  .connect(MONGODB_URI)
+  .connect(MONGODB_URI, {
+    family: 4,
+    serverSelectionTimeoutMS: 5000
+  })
   .then(() => {
     console.log("✅ Successfully connected to MongoDB Database!");
   })
   .catch((err) => {
-    console.warn("⚠️ MongoDB Atlas connection pending URI password setup:", err.message);
+    console.warn("⚠️ MongoDB Atlas connection notice:", err.message);
   });
