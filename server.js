@@ -75,13 +75,22 @@ app.use("/api/auth", authRouter);
 app.use("/api/results", resultsRouter);
 app.use("/api/subjects", subjectsRouter);
 
-// JSON fallback for unhandled /api requests
-app.use("/api/*", (req, res) => {
-  res.status(404).json({ message: "API endpoint not found." });
-});
+// Serve static frontend files with automatic .html extension resolution
+app.use(express.static(path.join(__dirname), { extensions: ["html", "htm"] }));
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname)));
+// Wildcard fallback for clean routes or unhandled paths
+app.get("*", (req, res) => {
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ message: "API endpoint not found." });
+  }
+  const requestedFile = req.path === "/" ? "index.html" : (req.path.endsWith(".html") ? req.path : `${req.path}.html`);
+  const filePath = path.join(__dirname, requestedFile);
+  const fs = require("fs");
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
+  }
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 // Start Express server only if executed directly (e.g. node server.js)
 if (require.main === module) {
