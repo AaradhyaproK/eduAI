@@ -10,6 +10,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 
 const { router: authRouter } = require("./routes/auth");
 const resultsRouter = require("./routes/results");
@@ -83,13 +84,24 @@ app.get("*", (req, res) => {
   if (req.path.startsWith("/api")) {
     return res.status(404).json({ message: "API endpoint not found." });
   }
-  // Never return index.html for static assets (.js, .css, .json, .ico, etc.)
-  if (path.extname(req.path)) {
+
+  // Favicon handler
+  if (req.path === "/favicon.ico") {
+    const faviconPath = path.join(__dirname, "favicon.ico");
+    if (fs.existsSync(faviconPath)) {
+      return res.sendFile(faviconPath);
+    }
+    return res.status(204).end();
+  }
+
+  // Never return index.html for non-HTML static assets (.js, .css, .json, .png, etc.)
+  const ext = path.extname(req.path);
+  if (ext && ext !== ".html" && ext !== ".htm") {
     return res.status(404).send("Asset not found");
   }
+
   const requestedFile = req.path === "/" ? "index.html" : (req.path.endsWith(".html") ? req.path : `${req.path}.html`);
   const filePath = path.join(__dirname, requestedFile);
-  const fs = require("fs");
   if (fs.existsSync(filePath)) {
     return res.sendFile(filePath);
   }
