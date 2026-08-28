@@ -83,6 +83,10 @@ app.get("*", (req, res) => {
   if (req.path.startsWith("/api")) {
     return res.status(404).json({ message: "API endpoint not found." });
   }
+  // Never return index.html for static assets (.js, .css, .json, .ico, etc.)
+  if (path.extname(req.path)) {
+    return res.status(404).send("Asset not found");
+  }
   const requestedFile = req.path === "/" ? "index.html" : (req.path.endsWith(".html") ? req.path : `${req.path}.html`);
   const filePath = path.join(__dirname, requestedFile);
   const fs = require("fs");
