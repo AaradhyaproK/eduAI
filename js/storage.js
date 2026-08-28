@@ -113,18 +113,24 @@ async function loginUserWithMongo({ username, password }) {
       body: JSON.stringify({ username, password })
     });
     const data = await parseJsonResponse(res);
-    if (!res.ok) throw new Error(data.message || "Login failed");
+    if (!res.ok) throw new Error(data.message || "Invalid username or password.");
     if (data.token) setAuthToken(data.token);
     if (data.user) setCurrentStudent(data.user);
     return data;
   } catch (err) {
+    if (err.message && !err.message.includes("Failed to fetch") && !err.message.includes("NetworkError") && !err.message.includes("Server returned non-JSON")) {
+      throw err;
+    }
     console.warn("MongoDB Login API notice:", err.message);
-    if (err.message.includes("Server returned non-JSON")) throw err;
     // Local fallback
     const students = getStudents();
-    const student = students.find(s => s.name === username || s.username === username);
+    const student = students.find(s => 
+      s.name === username || 
+      s.username === username || 
+      (s.username && s.username.toLowerCase() === username.toLowerCase().trim())
+    );
     if (!student || student.password !== password) {
-      throw new Error("Invalid username or password.");
+      throw new Error(err.message || "Invalid username or password.");
     }
     setCurrentStudent(student);
     return { user: student };
