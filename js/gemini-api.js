@@ -30,21 +30,6 @@ async function getGeminiApiKey() {
     } catch (e) {
       // Ignore API config fetch error
     }
-
-    try {
-      const res = await fetch(".env");
-      if (res.ok) {
-        const text = await res.text();
-        const match = text.match(/^\s*GEMINI_API_KEY\s*=\s*(.+)$/m);
-        if (match) {
-          const key = match[1].trim().replace(/^["']|["']$/g, "");
-          window.GEMINI_API_KEY = key;
-          return key;
-        }
-      }
-    } catch (e) {
-      console.warn("Could not load .env file dynamically:", e);
-    }
   }
   return "";
 }
