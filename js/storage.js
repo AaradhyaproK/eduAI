@@ -16,10 +16,10 @@ const RESULTS_KEY = "smartStudentPortalResults";
 const THEME_KEY = "smartStudentPortalTheme";
 const AUTH_TOKEN_KEY = "edumindAuthToken";
 
-// Dynamic API Base URL resolver (Routes requests to Express server on port 3000 if opened via Live Server, file://, or secondary ports)
+// Dynamic API Base URL resolver
 const API_BASE_URL = (typeof window !== "undefined" && (
   window.location.protocol === "file:" || 
-  (window.location.port && window.location.port !== "3000")
+  ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && window.location.port && window.location.port !== "3000")
 ))
   ? "http://localhost:3000"
   : "";
@@ -29,7 +29,7 @@ async function parseJsonResponse(res) {
   const contentType = res.headers.get("content-type") || "";
   if (!contentType.includes("application/json")) {
     const text = await res.text();
-    throw new Error(`Server returned non-JSON response. Please ensure Express server is running on port 3000.`);
+    throw new Error(`Server returned non-JSON response (${res.status}). Please check backend API server.`);
   }
   return await res.json();
 }

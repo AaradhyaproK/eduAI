@@ -16,6 +16,21 @@ async function getGeminiApiKey() {
   if (typeof window !== "undefined") {
     if (window.GEMINI_API_KEY) return window.GEMINI_API_KEY;
     if (window.env && window.env.GEMINI_API_KEY) return window.env.GEMINI_API_KEY;
+
+    try {
+      const baseUrl = typeof API_BASE_URL !== "undefined" ? API_BASE_URL : "";
+      const res = await fetch(`${baseUrl}/api/config`);
+      if (res.ok) {
+        const config = await res.json();
+        if (config.geminiApiKey) {
+          window.GEMINI_API_KEY = config.geminiApiKey;
+          return config.geminiApiKey;
+        }
+      }
+    } catch (e) {
+      // Ignore API config fetch error
+    }
+
     try {
       const res = await fetch(".env");
       if (res.ok) {
