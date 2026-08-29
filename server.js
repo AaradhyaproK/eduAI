@@ -76,10 +76,11 @@ app.use("/api/auth", authRouter);
 app.use("/api/results", resultsRouter);
 app.use("/api/subjects", subjectsRouter);
 
-// Serve static frontend files with automatic .html extension resolution
+// Serve static frontend files (Vite build output in dist directory)
+app.use(express.static(path.join(__dirname, "dist")));
 app.use(express.static(path.join(__dirname), { extensions: ["html", "htm"] }));
 
-// Wildcard fallback for clean routes or unhandled paths
+// Wildcard fallback for clean SPA routes or unhandled paths
 app.get("*", (req, res) => {
   if (req.path.startsWith("/api")) {
     return res.status(404).json({ message: "API endpoint not found." });
@@ -87,27 +88,16 @@ app.get("*", (req, res) => {
 
   // Favicon handler
   if (req.path === "/favicon.ico") {
-    const faviconPath = path.join(__dirname, "favicon.ico");
+    const faviconPath = path.join(__dirname, "dist", "favicon.ico");
     if (fs.existsSync(faviconPath)) {
       return res.sendFile(faviconPath);
     }
     return res.status(204).end();
   }
 
-  // Never return index.html for non-HTML static assets (.js, .css, .json, .png, etc.)
-  const ext = path.extname(req.path);
-  if (ext && ext !== ".html" && ext !== ".htm") {
-    return res.status(404).send("Asset not found");
-  }
-
-  const cleanPath = req.path.replace(/^\/+/, "");
-  let fileName = cleanPath || "index.html";
-  if (!fileName.endsWith(".html")) {
-    fileName = `${fileName}.html`;
-  }
-  const filePath = path.join(__dirname, fileName);
-  if (fs.existsSync(filePath)) {
-    return res.sendFile(filePath);
+  const distIndexPath = path.join(__dirname, "dist", "index.html");
+  if (fs.existsSync(distIndexPath)) {
+    return res.sendFile(distIndexPath);
   }
   res.sendFile(path.join(__dirname, "index.html"));
 });
