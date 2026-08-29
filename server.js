@@ -100,8 +100,12 @@ app.get("*", (req, res) => {
     return res.status(404).send("Asset not found");
   }
 
-  const requestedFile = req.path === "/" ? "index.html" : (req.path.endsWith(".html") ? req.path : `${req.path}.html`);
-  const filePath = path.join(__dirname, requestedFile);
+  const cleanPath = req.path.replace(/^\/+/, "");
+  let fileName = cleanPath || "index.html";
+  if (!fileName.endsWith(".html")) {
+    fileName = `${fileName}.html`;
+  }
+  const filePath = path.join(__dirname, fileName);
   if (fs.existsSync(filePath)) {
     return res.sendFile(filePath);
   }
@@ -110,9 +114,20 @@ app.get("*", (req, res) => {
 
 // Start Express server only if executed directly (e.g. node server.js)
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🚀 EduMind AI Server running at http://localhost:${PORT}`);
-  });
+  const startServer = (portToUse) => {
+    const server = app.listen(portToUse, () => {
+      console.log(`🚀 EduMind AI Server running at http://localhost:${portToUse}`);
+    });
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`⚠️ Port ${portToUse} is in use. Automatically switching to http://localhost:${Number(portToUse) + 1}...`);
+        startServer(Number(portToUse) + 1);
+      } else {
+        console.error("Server error:", err);
+      }
+    });
+  };
+  startServer(PORT);
 }
 
 module.exports = app;
