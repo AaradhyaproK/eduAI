@@ -3,15 +3,7 @@
   "cleanUrls": true,
   "functions": {
     "api/index.js": {
-      "includeFiles": [
-        "data/**",
-        "*.html",
-        "css/**",
-        "js/**",
-        "routes/**",
-        "models/**",
-        "utils/**"
-      ]
+      "includeFiles": "**"
     }
   },
   "rewrites": [
