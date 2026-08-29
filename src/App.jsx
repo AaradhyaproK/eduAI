@@ -8,7 +8,6 @@ import Footer from "./components/Footer";
 
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import DashboardPage from "./pages/DashboardPage";
 import SubjectsPage from "./pages/SubjectsPage";
 import LessonPage from "./pages/LessonPage";
@@ -40,7 +39,6 @@ export default function App() {
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 
                 <Route
                   path="/dashboard"

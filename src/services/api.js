@@ -56,26 +56,15 @@ async function parseJsonResponse(res) {
   return await res.json();
 }
 
-// MongoDB Auth API calls
-export async function sendRegisterOtpApi(userData) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/register-send-otp`, {
+// Direct Registration API call
+export async function registerUserApi(userData) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData)
   });
   const data = await parseJsonResponse(res);
-  if (!res.ok) throw new Error(data.message || "Failed to send registration OTP");
-  return data;
-}
-
-export async function verifyRegisterOtpApi({ regToken, otp }) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/register-verify-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ regToken, otp })
-  });
-  const data = await parseJsonResponse(res);
-  if (!res.ok) throw new Error(data.message || "Failed to verify OTP and save account");
+  if (!res.ok) throw new Error(data.message || "Failed to create account");
   if (data.token) setAuthToken(data.token);
   if (data.user) setCurrentStudent(data.user);
   return data;

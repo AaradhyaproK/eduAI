@@ -22,78 +22,63 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// Step 1: Send Registration Email OTP (NO account saved in MongoDB yet)
-router.post("/register-send-otp", async (req, res) => {
+// Direct Account Registration without OTP
+router.post("/register", async (req, res) => {
   try {
     const { name, username, email, password, schoolName, className } = req.body;
-    const sendEmail = require("../utils/sendEmail");
 
-    if (!name || !username || !email || !password) {
-      return res.status(400).json({ message: "Name, Username, Email, and Password are required." });
+    const reqName = name || username;
+    const reqUsername = (username || name || "").toLowerCase().trim();
+    const reqEmail = (email || `${reqUsername}@example.com`).toLowerCase().trim();
+
+    if (!reqName || !reqUsername || !password) {
+      return res.status(400).json({ message: "Name, Username, and Password are required." });
     }
 
     if (password.length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters." });
     }
 
-    // Check if username or email already exists in MongoDB
-    const existingUsername = await User.findOne({ username: username.toLowerCase().trim() });
-    if (existingUsername) {
-      return res.status(400).json({ message: "Username already registered. Please choose another username or log in." });
-    }
-
-    const existingEmail = await User.findOne({ email: email.toLowerCase().trim() });
-    if (existingEmail) {
-      return res.status(400).json({ message: "An account with this email already exists. Please log in." });
-    }
-
-    // Generate 6-digit OTP code
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Create a temporary JWT registration token holding pending registration payload + OTP
-    const regToken = jwt.sign(
-      {
-        pendingUser: {
-          name: name.trim(),
-          username: username.toLowerCase().trim(),
-          email: email.toLowerCase().trim(),
-          password,
-          schoolName: schoolName || "Day Care Centre School",
-          className: className || "Class 5"
-        },
-        otp
-      },
-      JWT_SECRET,
-      { expiresIn: "15m" }
-    );
-
-    // Send OTP email via Nodemailer
-    await sendEmail({
-      to: email.trim(),
-      subject: "🎉 EduMind AI - Verify Email to Complete Registration",
-      text: `Hello ${name},\n\nYour 6-digit OTP code to verify your email and create your EduMind AI account is: ${otp}\n\nThis OTP is valid for 15 minutes.`,
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px;">
-          <h2 style="color: #2b6cb0; text-align: center;">📘 Welcome to EduMind AI!</h2>
-          <p>Hello <strong>${name}</strong>,</p>
-          <p>Your 6-digit OTP code to verify your email and complete account setup is:</p>
-          <div style="background: #edf2f7; font-size: 28px; font-weight: bold; letter-spacing: 5px; text-align: center; padding: 15px; border-radius: 8px; margin: 20px 0; color: #2d3748;">
-            ${otp}
-          </div>
-          <p style="font-size: 13px; color: #718096;">Please enter this code on the registration page to create your account. Valid for 15 minutes.</p>
-        </div>
-      `
+    const existing = await User.findOne({
+      $or: [{ username: reqUsername }, { email: reqEmail }]
     });
 
-    res.json({
-      message: `OTP sent to ${email}`,
-      regToken,
-      email: email.trim(),
-      demoOtp: process.env.EMAIL_USER ? undefined : otp
+    if (existing) {
+      return res.status(400).json({ message: "An account with this username or email already exists. Please log in." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = new User({
+      name: reqName,
+      username: reqUsername,
+      email: reqEmail,
+      password: hashedPassword,
+      schoolName: schoolName || "Day Care Centre School",
+      className: className || "Class 5",
+      isVerified: true
+    });
+
+    await user.save();
+
+    const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: "7d" });
+
+    res.status(201).json({
+      message: "🎉 Account created successfully!",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        schoolName: user.schoolName,
+        className: user.className
+      }
     });
   } catch (error) {
-    console.error("Register send OTP error:", error);
-    res.status(500).json({ message: "Failed to send registration OTP email." });
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Failed to create account. Please try again." });
   }
 });
 

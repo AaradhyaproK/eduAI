@@ -111,9 +111,8 @@ export default function LoginPage() {
                     {loading ? "Logging in..." : "Login"}
                   </button>
 
-                  <div className="d-flex justify-content-between flex-wrap gap-2 auth-links">
-                    <Link to="/forgot-password">Forgot Password?</Link>
-                    <Link to="/register">Create Account</Link>
+                  <div className="text-center auth-links">
+                    <Link to="/register" className="fw-semibold">Don't have an account? Create Account</Link>
                   </div>
 
                   <div className="text-center my-3 auth-divider">---------------- OR ----------------</div>
