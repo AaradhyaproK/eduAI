@@ -3,12 +3,12 @@
   "cleanUrls": true,
   "functions": {
     "api/index.js": {
-      "includeFiles": "{data/**,*.html,css/**,js/**}"
+      "includeFiles": "{data/**,*.html,css/**,js/**,routes/**,models/**,utils/**}"
     }
   },
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "/(.*)",
       "destination": "/api/index.js"
     }
   ]
