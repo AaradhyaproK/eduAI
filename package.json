@@ -1,5 +1,5 @@
 {
-  "name": "student-learning-portal",
+  "name": "edumind-ai",
   "version": "1.0.0",
   "description": "Smart Student Learning Portal with Gemini AI & MongoDB Integration",
   "main": "server.js",
