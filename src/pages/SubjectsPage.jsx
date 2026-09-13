@@ -48,12 +48,6 @@ export default function SubjectsPage() {
           >
             🏫 Day Care Centre School
           </button>
-          <button
-            className={`btn px-4 py-2 fw-semibold ${selectedSchool === "Guru Gobind Singh Public School" ? "btn-primary" : "btn-outline-primary"}`}
-            onClick={() => setSelectedSchool("Guru Gobind Singh Public School")}
-          >
-            🏫 Guru Gobind Singh Public School
-          </button>
         </div>
       </div>
 
