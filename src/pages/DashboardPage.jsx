@@ -63,6 +63,29 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* School ERP Spotlight Card */}
+      <div className="card border-0 rounded-4 shadow-sm p-4 mb-4 bg-white border-start border-primary border-4">
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div className="d-flex align-items-center gap-3">
+            <div className="fs-1 p-3 bg-primary-subtle rounded-4 text-primary">
+              🏫
+            </div>
+            <div>
+              <div className="d-flex align-items-center gap-2">
+                <h4 className="fw-bold mb-0 text-dark">Institutional School ERP Simulation Suite</h4>
+                <span className="badge bg-success-subtle text-success rounded-pill fw-semibold">New</span>
+              </div>
+              <p className="text-muted small mb-0 mt-1">
+                Explore full school operations: Student SIS, RFID Smart Gate Attendance, Report Cards, Fee Counter & Gateway, Live Bus GPS Fleet, Library Desk, and HR Payroll.
+              </p>
+            </div>
+          </div>
+          <Link to="/erp" className="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+            Launch School ERP →
+          </Link>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="row g-4 mb-5">
         <div className="col-md-3 col-sm-6">

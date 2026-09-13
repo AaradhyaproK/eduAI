@@ -17,6 +17,11 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  // Don't render general portal navbar when inside dedicated School ERP
+  if (location.pathname.startsWith("/erp")) {
+    return null;
+  }
+
   return (
     <nav className="navbar navbar-expand-lg fixed-top shadow-sm">
       <div className="container">
@@ -59,6 +64,11 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li className="nav-item">
+                  <Link className={`nav-link ${isActive("/erp") ? "active fw-bold text-primary" : "fw-semibold text-primary"}`} to="/erp">
+                    🏫 School ERP
+                  </Link>
+                </li>
+                <li className="nav-item">
                   <Link className={`nav-link ${isActive("/profile") ? "active" : ""}`} to="/profile">
                     👤 Profile ({currentUser.name || currentUser.username})
                   </Link>
@@ -71,6 +81,11 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                <li className="nav-item">
+                  <Link className={`nav-link ${isActive("/erp") ? "active fw-bold text-primary" : "fw-semibold text-primary"}`} to="/erp">
+                    🏫 School ERP
+                  </Link>
+                </li>
                 <li className="nav-item">
                   <Link className={`nav-link ${isActive("/login") || isActive("/") ? "active" : ""}`} to="/login">
                     Login

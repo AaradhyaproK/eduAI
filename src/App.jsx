@@ -18,6 +18,7 @@ import QuestionGeneratorPage from "./pages/QuestionGeneratorPage";
 import ProfilePage from "./pages/ProfilePage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import SchoolERPPage from "./pages/SchoolERPPage";
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -105,6 +106,7 @@ export default function App() {
                   }
                 />
 
+                <Route path="/erp" element={<SchoolERPPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

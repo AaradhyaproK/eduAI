@@ -1,6 +1,13 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 
 export default function Footer() {
+  const location = useLocation();
+
+  if (location.pathname.startsWith("/erp")) {
+    return null;
+  }
+
   return (
     <footer className="footer py-4 mt-5">
       <div className="container text-center">

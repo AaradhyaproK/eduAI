@@ -158,3 +158,143 @@ body.dark-mode .loader-overlay {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
 }
+
+/* School ERP Simulation Styles */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0284c7 100%);
+}
+
+.hover-elevate {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-elevate:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.hover-cell:hover {
+  background-color: #f1f5f9;
+}
+
+.role-pills-bar::-webkit-scrollbar,
+.erp-tab-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.role-pills-bar::-webkit-scrollbar-thumb,
+.erp-tab-bar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+body:has(.erp-dedicated-layout) {
+  padding-top: 0 !important;
+  background: #f8fafc !important;
+}
+
+.bg-slate-50 { background-color: #f8fafc !important; }
+.bg-slate-100 { background-color: #f1f5f9 !important; }
+.text-slate-600 { color: #475569 !important; }
+.text-slate-700 { color: #334155 !important; }
+.text-slate-800 { color: #1e293b !important; }
+.text-slate-900 { color: #0f172a !important; }
+
+.bg-emerald-50 { background-color: #ecfdf5 !important; }
+.text-emerald-700 { color: #047857 !important; }
+.border-emerald-200 { border-color: #a7f3d0 !important; }
+
+.bg-amber-50 { background-color: #fffbeb !important; }
+.text-amber-700 { color: #b45309 !important; }
+.border-amber-200 { border-color: #fde68a !important; }
+
+.bg-rose-50 { background-color: #fff1f2 !important; }
+.text-rose-700 { color: #be123c !important; }
+.border-rose-200 { border-color: #fecdd3 !important; }
+
+.bg-blue-50 { background-color: #eff6ff !important; }
+.text-blue-700 { color: #1d4ed8 !important; }
+.border-blue-200 { border-color: #bfdbfe !important; }
+
+.shadow-xs {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
+}
+
+.pulse-glow {
+  animation: pulseGlow 1.8s infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.pulse-badge {
+  animation: pulseBadge 1.2s infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Print Rules for Official Report Cards, Fee Receipts, and Payslips */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding-top: 0 !important;
+  }
+
+  .navbar,
+  .footer,
+  .no-print,
+  .btn,
+  .erp-header,
+  .erp-tab-bar,
+  .modal-header,
+  .modal-footer {
+    display: none !important;
+  }
+
+  .modal {
+    position: static !important;
+    display: block !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+
+  .modal-dialog {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .modal-content {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .print-document-container {
+    padding: 0 !important;
+    color: #000000 !important;
+    font-size: 12pt !important;
+  }
+
+  .table {
+    border-color: #000000 !important;
+  }
+}
+
